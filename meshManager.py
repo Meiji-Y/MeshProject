@@ -34,7 +34,7 @@ class MeshManager:
 
         return filtered_triangles, filtered_vertices
 
-    def apply_clustering(self, mesh, dataset_name, eps=0.02, min_samples=20):
+    def apply_DBSCAN(self, mesh, dataset_name, eps=0.02, min_samples=20):
 
         filtered_triangles, filtered_vertices = self.apply_filters(mesh)
 
@@ -84,6 +84,29 @@ class MeshManager:
         print(f"Total number of triangles before filtering: {total_triangles}")
         print(f"Number of triangles after filtering and clustering: {remaining_triangles}")
         print(f"Number of clusters: {num_clusters}")
+    
+    def apply_birch(self, mesh, dataset_name, threshold=0.01, branching_factor=50):
+        filtered_triangles, filtered_vertices = self.apply_filters(mesh)
 
+        clustering = Birch(threshold=threshold, branching_factor=branching_factor).fit(filtered_vertices)
+        labels = clustering.labels_
 
-        
+        filtered_colors = labels / (np.max(labels) + 1.0)
+        filtered_colors = plt.cm.jet(filtered_colors)[:, :3]
+
+        filtered_mesh = o3d.geometry.TriangleMesh()
+        filtered_mesh.vertices = o3d.utility.Vector3dVector(filtered_vertices)
+        filtered_mesh.triangles = o3d.utility.Vector3iVector(filtered_triangles)
+        filtered_mesh.vertex_colors = o3d.utility.Vector3dVector(filtered_colors)
+
+        filtered_mesh.remove_unreferenced_vertices()
+
+        o3d.io.write_triangle_mesh(f"filtered_birch_{dataset_name}", filtered_mesh)
+
+        total_triangles = len(mesh.triangles)
+        remaining_triangles = len(filtered_mesh.triangles)
+        num_clusters = len(np.unique(labels))
+        print(f"Total number of triangles before filtering: {total_triangles}")
+        print(f"Number of triangles after filtering and clustering: {remaining_triangles}")
+        print(f"Number of clusters: {num_clusters}")
+    
