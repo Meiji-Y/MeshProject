@@ -38,7 +38,7 @@ for i in range(1,12):
 
     #Clustering
     start_time = time.time()
-    obj.apply_clusteringr(mesh,dataset_name)
+    obj.apply_DBSCAN(mesh,dataset_name)
     end_time = time.time()
 
     elapsed_time = end_time - start_time
