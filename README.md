@@ -12,8 +12,6 @@
 - sk.learn
 - matplotlib
 
-## Author
 
-This program is authored by Muhlis Erdem Yildiz.
 
 
